@@ -211,7 +211,7 @@ def send_telegram_message(text):
             logging.error("Sending Telegram message failed {} times, please check your credentials!".format(tries))
             done = True
 
-def check_connecting(zoom_pid, start_date, duration):
+def wait_for_connecting(zoom_pid, start_date, duration):
     # Check if connecting
     check_periods = 0
     connecting = False
@@ -487,7 +487,7 @@ def join(meet_id, meet_pw, duration, description):
         return
 
     # Check if connecting
-    check_connecting(zoom.pid, start_date, duration)
+    wait_for_connecting(zoom.pid, start_date, duration)
 
     if not join_by_url:
         pyautogui.write(meet_pw, interval=0.2)
@@ -547,7 +547,7 @@ def join(meet_id, meet_pw, duration, description):
         time.sleep(2)
 
     # Check if connecting
-    check_connecting(zoom.pid, start_date, duration)
+    wait_for_connecting(zoom.pid, start_date, duration)
 
     # Check if in waiting room
     check_periods = 0
@@ -584,7 +584,7 @@ def join(meet_id, meet_pw, duration, description):
 
     # Meeting joined
     # Check if connecting
-    check_connecting(zoom.pid, start_date, duration)
+    wait_for_connecting(zoom.pid, start_date, duration)
 
     logging.info("Joined meeting..")
 
