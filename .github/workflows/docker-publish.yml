@@ -15,8 +15,8 @@ on:
       - 'example/**'
 
 jobs:
-  push_to_registries:
-    name: Push Docker image to multiple registries
+  push_to_ghcr:
+    name: Push Docker image to GHCR
     runs-on: ubuntu-latest
     permissions:
       packages: write
@@ -24,34 +24,25 @@ jobs:
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
-      - name: Log in to Docker Hub
-        continue-on-error: ${{ github.event_name == 'pull_request' }}
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-      - name: Log in to the Container registry
-        continue-on-error: ${{ github.event_name == 'pull_request' }}
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      # - name: Set up QEMU
+      #   uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login to GHCR
+        if: github.event_name != 'pull_request'
         uses: docker/login-action@v1
         with:
           registry: ghcr.io
-          username: ${{ github.actor }}
+          username: NicoWeio
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build and push to Docker Hub
-        uses: docker/build-push-action@v2
+      # Docker requires image tags to be in all lowercase
+      - name: Build and push
+        uses: docker/build-push-action@v3
         with:
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ github.repository }}:latest
-          #tags: ${{ github.repository }}:${{ env.BRANCH }}
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v3
-        with:
-          images: ghcr.io/${{ github.repository }}
-      - name: Build and push to GitHub Packages
-        uses: docker/build-push-action@v2
-        with:
-          push: ${{ github.event_name != 'pull_request' }}
           context: .
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          file: Dockerfile
+          # platforms: linux/amd64,linux/arm/v7,linux/arm64
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ghcr.io/nicoweio/zoomrec:latest
