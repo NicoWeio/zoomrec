@@ -72,7 +72,6 @@ VIDEO_PANEL_HIDDEN = False
 def click_helper(
             click_image,
             condition_image=None,
-            click=True,
             retry=False,
             fail_if_not_found=False,
             minSearchTime=2,
@@ -81,7 +80,9 @@ def click_helper(
             raise NotImplementedError
         if not condition_image:
             condition_image = click_image
+        click = True # TODO: Do we want to have this as an option?
 
+        logging.info(f"Looking for {condition_image}..")
         # tuple[int, int] | None
         condition_coords = pyautogui.locateCenterOnScreen(
             os.path.join(IMG_PATH, condition_image),
@@ -91,8 +92,8 @@ def click_helper(
         )
         if not condition_coords:
             if fail_if_not_found:
-                raise RuntimeError(f"Could not find {condition_image}!")
-            logging.info(f"Could not find {condition_image}")
+                raise RuntimeError(f"Could not find {condition_image} (condition)!")
+            logging.info(f"Could not find {condition_image} (condition)")
             return False
 
         if click:
@@ -104,7 +105,7 @@ def click_helper(
             )
             if not click_coords:
                 # Here, we don't want to respect fail_if_not_found
-                raise RuntimeError(f"Could not find {click_image}!")
+                raise RuntimeError(f"Could not find {click_image} (click)!")
 
             pyautogui.click(*click_coords)
 
@@ -200,8 +201,7 @@ class HideViewOptionsThread:
                         pyautogui.click(x, y)
                         time.sleep(1)
                         # Hide video panel
-                        if pyautogui.locateOnScreen(IMG_PATH /  'show_video_panel.png'),
-                                                    confidence=0.9) is not None:
+                        if pyautogui.locateOnScreen(IMG_PATH /  'show_video_panel.png', confidence=0.9) is not None:
                             # Leave 'Show video panel' and move mouse from screen
                             pyautogui.moveTo(0, 100)
                             pyautogui.click(0, 100)
@@ -255,10 +255,9 @@ def send_telegram_message(text):
             done = True
 
 def wait_for_connecting(zoom_pid, start_date, duration):
-    # Check if connecting
     check_periods = 0
     connecting = False
-    # Check if connecting
+
     if pyautogui.locateCenterOnScreen(IMG_PATH /  'connecting.png', confidence=0.9) is not None:
         connecting = True
         logging.info("Connecting..")
