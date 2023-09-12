@@ -496,20 +496,45 @@ def join(meet_id, meet_pw, duration, description):
         pyautogui.press('tab')
         pyautogui.press('space')
 
-    # Check if connecting
     wait_for_connecting(zoom.pid, start_date, duration)
 
-    # Agree to the ToS and Privacy Policy
-    while pyautogui.locateCenterOnScreen(os.path.join(
-            IMG_PATH, 'i_agree.png'), confidence=0.9, minSearchTime=3) is not None:
-        logging.info("Accepting ToS / Privacy Policy..")
-        pyautogui.press('space')
-        pyautogui.press('tab') # TODO: This is just to brute-force with less restarts
-        time.sleep(2)
-    else:
-        logging.info("Did not find ToS / Privacy Policy dialog.")
+    def click_helper(
+        click_image,
+        click=True,
+        retry=False,
+        fail_if_not_found=False,
+        minSearchTime=2,
+    ):
+        if retry:
+            raise NotImplementedError
 
-    # Check if connecting
+        # tuple[int, int] | None
+        coords = pyautogui.locateCenterOnScreen(
+            os.path.join(IMG_PATH, click_image),
+            # IMG_PATH / click_image,
+            confidence=0.9,
+            minSearchTime=minSearchTime,
+        )
+        if not coords:
+            if fail_if_not_found:
+                raise RuntimeError(f"Could not find {click_image}!")
+            logging.info(f"Could not find {click_image}")
+            return False
+
+        if click:
+            pyautogui.click(**coords)
+
+        return True
+
+
+
+    # Agree to the ToS and Privacy Policy
+    click_helper(
+        icon_image="i_agree.png",
+        click=True,
+        minSearchTime=3,
+    )
+
     wait_for_connecting(zoom.pid, start_date, duration)
 
     logging.info("Joined meeting! :)")
