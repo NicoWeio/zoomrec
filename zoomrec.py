@@ -105,9 +105,13 @@ def click_helper(
                 # Here, we don't want to respect fail_if_not_found
                 raise RuntimeError(f"Could not find {click_image}!")
 
-            pyautogui.click(**click_coords)
+            pyautogui.click(*click_coords)
 
         return True
+
+def press_sequence(sequence):
+    for key in sequence:
+        pyautogui.press(key)
 
 
 class BackgroundThread:
@@ -299,13 +303,11 @@ def join_meeting_id(meet_id):
     time.sleep(2)
 
     # Insert meeting id
-    pyautogui.press('tab')
-    pyautogui.press('tab')
+    press_sequence(2*['tab'])
     pyautogui.write(meet_id, interval=0.1)
 
     # Insert name
-    pyautogui.press('tab')
-    pyautogui.press('tab')
+    press_sequence(2*['tab'])
     pyautogui.hotkey('ctrl', 'a')
     pyautogui.write(DISPLAY_NAME, interval=0.1)
 
@@ -332,12 +334,9 @@ def join_meeting_url():
     pyautogui.write(DISPLAY_NAME, interval=0.1)
 
     # Configure
-    pyautogui.press('tab')
-    pyautogui.press('space')
-    pyautogui.press('tab')
-    pyautogui.press('space')
-    pyautogui.press('tab')
-    pyautogui.press('space')
+    press_sequence([
+        'tab', 'space', 'tab', 'space', 'tab', 'space'
+    ])
 
     time.sleep(2)
 
@@ -535,8 +534,7 @@ def join(meet_id, meet_pw, duration, description):
 
     if not join_by_url:
         pyautogui.write(meet_pw, interval=0.2)
-        pyautogui.press('tab')
-        pyautogui.press('space')
+        press_sequence(['tab', 'space'])
 
     wait_for_connecting(zoom.pid, start_date, duration)
 
