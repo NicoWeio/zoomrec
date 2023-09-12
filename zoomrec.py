@@ -476,6 +476,13 @@ def join(meet_id, meet_pw, duration, description):
         time.sleep(2)
         joined = join_meeting_url()
 
+    # Agree to the ToS and Privacy Policy
+    if pyautogui.locateCenterOnScreen(os.path.join(
+            IMG_PATH, 'i_agree.png'), confidence=0.9, minSearchTime=3) is not None:
+        logging.info("Accepting ToS / Privacy Policy..")
+        # pyautogui.press('tab')
+        pyautogui.press('space')
+
     if not joined:
         send_telegram_message("Failed to join meeting {}!".format(description))
         logging.error("Failed to join meeting!")
