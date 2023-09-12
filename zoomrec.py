@@ -303,7 +303,9 @@ def join_meeting_url():
 
 
 def check_error():
-    # Sometimes invalid id error is displayed
+    """
+    Sometimes invalid id error is displayed
+    """
     if pyautogui.locateCenterOnScreen(os.path.join(
             IMG_PATH, 'invalid_meeting_id.png'), confidence=0.9) is not None:
         logging.error("Maybe a invalid meeting id was inserted..")
@@ -462,7 +464,7 @@ def join(meet_id, meet_pw, duration, description):
         list_of_process_ids = find_process_id_by_name('zoom')
         time.sleep(1)
 
-    # Wait for zoom is started
+    # Wait until zoom is started
     while pyautogui.locateCenterOnScreen(os.path.join(IMG_PATH, img_name), confidence=0.9) is None:
         logging.info("Zoom not ready yet!")
         time.sleep(1)
@@ -481,7 +483,7 @@ def join(meet_id, meet_pw, duration, description):
         logging.error("Failed to join meeting!")
         os.killpg(os.getpgid(zoom.pid), signal.SIGQUIT)
         if DEBUG and ffmpeg_debug is not None:
-            # closing ffmpeg
+            # close ffmpeg
             os.killpg(os.getpgid(ffmpeg_debug.pid), signal.SIGQUIT)
             atexit.unregister(os.killpg)
         return
