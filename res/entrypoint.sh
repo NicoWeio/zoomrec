@@ -3,6 +3,7 @@ set -e
 
 cleanup () {
     kill -s SIGTERM $!
+    echo "Caught SIGINT/SIGTERM, exiting gracefully..."
     exit 0
 }
 trap cleanup SIGINT SIGTERM
@@ -58,8 +59,12 @@ export SESSION_MANAGER=$(cat ~/.ICEauthority | perl -pe 's/.*(local.*?unix\/\d*)
 # Start python script in separated terminal
 if [[ "$DEBUG" == "True" ]]; then
   # Wait if something failed
+  echo "Starting Python script in debug mode (waits on error)"
   xfce4-terminal -H --geometry 85x7+0 --title=zoomrec --hide-toolbar --hide-menubar --hide-scrollbar --hide-borders --zoom=-3 -e "python3 -u ${HOME}/zoomrec.py"
 else
   # Exit container if something failed
+  echo "Starting Python script in normal mode (exits on error)"
   xfce4-terminal --geometry 85x7+0 --title=zoomrec --hide-toolbar --hide-menubar --hide-scrollbar --hide-borders --zoom=-3 -e "python3 -u ${HOME}/zoomrec.py"
 fi
+
+echo "Script exited"

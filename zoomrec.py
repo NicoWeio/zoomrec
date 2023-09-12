@@ -44,7 +44,7 @@ TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 TELEGRAM_RETRIES = 5
 
 DISPLAY_NAME = os.getenv('DISPLAY_NAME')
-if DISPLAY_NAME is None or  len(DISPLAY_NAME) < 3:
+if DISPLAY_NAME is None or len(DISPLAY_NAME) < 3:
     NAME_LIST = [
         'iPhone',
         'iPad',
@@ -183,20 +183,20 @@ def send_telegram_message(text):
     global TELEGRAM_TOKEN
     global TELEGRAM_CHAT_ID
     global TELEGRAM_RETRIES
-	
+
     if TELEGRAM_TOKEN is None:
         logging.error("Telegram token is missing. No Telegram messages will be send!")
         return
-    
+
     if TELEGRAM_CHAT_ID is None:
         logging.error("Telegram chat_id is missing. No Telegram messages will be send!")
         return
-        
+
     if len(TELEGRAM_TOKEN) < 3 or len(TELEGRAM_CHAT_ID) < 3:
         logging.error("Telegram token or chat_id missing. No Telegram messages will be send!")
         return
 
-    url_req = "https://api.telegram.org/bot" + TELEGRAM_TOKEN + "/sendMessage" + "?chat_id=" + TELEGRAM_CHAT_ID + "&text=" + text 
+    url_req = "https://api.telegram.org/bot" + TELEGRAM_TOKEN + "/sendMessage" + "?chat_id=" + TELEGRAM_CHAT_ID + "&text=" + text
     tries = 0
     done = False
     while not done:
@@ -210,7 +210,7 @@ def send_telegram_message(text):
         if not done and tries >= TELEGRAM_RETRIES:
             logging.error("Sending Telegram message failed {} times, please check your credentials!".format(tries))
             done = True
-       
+
 def check_connecting(zoom_pid, start_date, duration):
     # Check if connecting
     check_periods = 0
@@ -300,7 +300,7 @@ def join_meeting_url():
     time.sleep(2)
 
     return check_error()
-    
+
 
 def check_error():
     # Sometimes invalid id error is displayed
@@ -454,7 +454,7 @@ def join(meet_id, meet_pw, duration, description):
         zoom = subprocess.Popen(f'zoom --url="{meet_id}"', stdout=subprocess.PIPE,
                                 shell=True, preexec_fn=os.setsid)
         img_name = 'join.png'
-    
+
     # Wait while zoom process is there
     list_of_process_ids = find_process_id_by_name('zoom')
     while len(list_of_process_ids) <= 0:
@@ -786,10 +786,10 @@ def join(meet_id, meet_pw, duration, description):
 
     # Start thread to check active screensharing
     HideViewOptionsThread()
-    
+
     # Send Telegram Notification
     send_telegram_message("Joined Meeting '{}' and started recording.".format(description))
-    
+
     meeting_running = True
     while meeting_running:
         time_remaining = end_date - datetime.now()
@@ -820,7 +820,7 @@ def join(meet_id, meet_pw, duration, description):
             if DEBUG:
                 pyautogui.screenshot(os.path.join(DEBUG_PATH, time.strftime(
                     TIME_FORMAT) + "-" + description) + "_ok_error.png")
-                
+
     send_telegram_message("Meeting '{}' ended.".format(description))
 
 def play_audio(description):
@@ -917,6 +917,7 @@ def setup_schedule():
 
 
 def main():
+    print("Python script started.")
     try:
         if DEBUG and not os.path.exists(DEBUG_PATH):
             os.makedirs(DEBUG_PATH)
