@@ -68,6 +68,48 @@ ONGOING_MEETING = False
 VIDEO_PANEL_HIDDEN = False
 
 
+def click_helper(
+            click_image,
+            condition_image=None,
+            click=True,
+            retry=False,
+            fail_if_not_found=False,
+            minSearchTime=2,
+        ):
+        if retry:
+            raise NotImplementedError
+        if not condition_image:
+            condition_image = click_image
+
+        # tuple[int, int] | None
+        condition_coords = pyautogui.locateCenterOnScreen(
+            os.path.join(IMG_PATH, condition_image),
+            # IMG_PATH / click_image,
+            confidence=0.9,
+            minSearchTime=minSearchTime,
+        )
+        if not condition_coords:
+            if fail_if_not_found:
+                raise RuntimeError(f"Could not find {condition_image}!")
+            logging.info(f"Could not find {condition_image}")
+            return False
+
+        if click:
+            click_coords = pyautogui.locateCenterOnScreen(
+                os.path.join(IMG_PATH, click_image),
+                # IMG_PATH / click_image,
+                confidence=0.9,
+                minSearchTime=minSearchTime,
+            )
+            if not click_coords:
+                # Here, we don't want to respect fail_if_not_found
+                raise RuntimeError(f"Could not find {click_image}!")
+
+            pyautogui.click(**click_coords)
+
+        return True
+
+
 class BackgroundThread:
 
     def __init__(self, interval=10):
@@ -498,39 +540,9 @@ def join(meet_id, meet_pw, duration, description):
 
     wait_for_connecting(zoom.pid, start_date, duration)
 
-    def click_helper(
-        click_image,
-        click=True,
-        retry=False,
-        fail_if_not_found=False,
-        minSearchTime=2,
-    ):
-        if retry:
-            raise NotImplementedError
-
-        # tuple[int, int] | None
-        coords = pyautogui.locateCenterOnScreen(
-            os.path.join(IMG_PATH, click_image),
-            # IMG_PATH / click_image,
-            confidence=0.9,
-            minSearchTime=minSearchTime,
-        )
-        if not coords:
-            if fail_if_not_found:
-                raise RuntimeError(f"Could not find {click_image}!")
-            logging.info(f"Could not find {click_image}")
-            return False
-
-        if click:
-            pyautogui.click(**coords)
-
-        return True
-
-
-
     # Agree to the ToS and Privacy Policy
     click_helper(
-        icon_image="i_agree.png",
+        click_image="i_agree.png",
         click=True,
         minSearchTime=3,
     )
