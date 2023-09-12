@@ -14,7 +14,7 @@ import requests
 from datetime import datetime, timedelta
 
 global ONGOING_MEETING
-global VIDEO_PANEL_HIDED
+global VIDEO_PANEL_HIDDEN
 global TELEGRAM_TOKEN
 global TELEGRAM_RETRIES
 global TELEGRAM_CHAT_ID
@@ -65,7 +65,7 @@ TIME_FORMAT = "%Y-%m-%d_%H-%M-%S"
 CSV_DELIMITER = ';'
 
 ONGOING_MEETING = False
-VIDEO_PANEL_HIDED = False
+VIDEO_PANEL_HIDDEN = False
 
 
 class BackgroundThread:
@@ -118,7 +118,7 @@ class HideViewOptionsThread:
         thread.start()  # Start the execution
 
     def run(self):
-        global VIDEO_PANEL_HIDED
+        global VIDEO_PANEL_HIDDEN
         logging.debug("Check continuously if screensharing is active..")
         while ONGOING_MEETING:
             # Check if host is sharing poll results
@@ -148,7 +148,7 @@ class HideViewOptionsThread:
 
             # Check if view options available
             if pyautogui.locateOnScreen(os.path.join(IMG_PATH, 'view_options.png'), confidence=0.9) is not None:
-                if not VIDEO_PANEL_HIDED:
+                if not VIDEO_PANEL_HIDDEN:
                     logging.info("Screensharing active..")
                     try:
                         x, y = pyautogui.locateCenterOnScreen(os.path.join(
@@ -161,7 +161,7 @@ class HideViewOptionsThread:
                             # Leave 'Show video panel' and move mouse from screen
                             pyautogui.moveTo(0, 100)
                             pyautogui.click(0, 100)
-                            VIDEO_PANEL_HIDED = True
+                            VIDEO_PANEL_HIDDEN = True
                         else:
                             try:
                                 x, y = pyautogui.locateCenterOnScreen(os.path.join(
@@ -169,13 +169,13 @@ class HideViewOptionsThread:
                                 pyautogui.click(x, y)
                                 # Move mouse from screen
                                 pyautogui.moveTo(0, 100)
-                                VIDEO_PANEL_HIDED = True
+                                VIDEO_PANEL_HIDDEN = True
                             except TypeError:
                                 logging.error("Could not hide video panel!")
                     except TypeError:
                         logging.error("Could not find view options!")
             else:
-                VIDEO_PANEL_HIDED = False
+                VIDEO_PANEL_HIDDEN = False
 
             time.sleep(self.interval)
 
@@ -415,7 +415,7 @@ def mute(description):
 
 
 def join(meet_id, meet_pw, duration, description):
-    global VIDEO_PANEL_HIDED
+    global VIDEO_PANEL_HIDDEN
     ffmpeg_debug = None
 
     logging.info("Join meeting: " + description)
@@ -722,7 +722,7 @@ def join(meet_id, meet_pw, duration, description):
             x, y = pyautogui.locateCenterOnScreen(os.path.join(
                 IMG_PATH, 'hide_video_panel.png'), confidence=0.9)
             pyautogui.click(x, y)
-            VIDEO_PANEL_HIDED = True
+            VIDEO_PANEL_HIDDEN = True
         except TypeError:
             logging.error("Could not hide video panel!")
             if DEBUG:
