@@ -1,5 +1,9 @@
+There's a list of many repos with similar goals at https://github.com/rootCircle/Zoom-AutoRecorder
+
+---
+
 <h1 align="center">
-    zoomrec	
+    zoomrec
 </h1>
 
 <h4 align="center">
@@ -111,10 +115,11 @@ To have access to the recordings, a volume is mounted, so you need to create a f
 
 #### Create folders and set permissions (on Host)
 
-```
+```shell
 mkdir -p recordings/screenshots
 chown -R 1000:1000 recordings
 
+# ↓ this is optional
 mkdir -p audio
 chown -R 1000:1000 audio
 ```
@@ -162,7 +167,7 @@ docker run -d --restart unless-stopped \
   --security-opt seccomp:unconfined \
 kastldratza/zoomrec:latest
 ```
-#### Set Zoom display name 
+#### Set Zoom display name
 ```
 docker run -d --restart unless-stopped \
   -e DISPLAY_NAME="zoomrec" \
