@@ -146,9 +146,9 @@ class BackgroundThread:
                     logging.error("Could not accept recording!")
 
             # Check if ended
-            if (pyautogui.locateOnScreen(IMG_PATH /  'meeting_ended_by_host_1.png'),
+            if (pyautogui.locateOnScreen(IMG_PATH /  'meeting_ended_by_host_1.png',
                                          confidence=0.9) is not None or pyautogui.locateOnScreen(
-                IMG_PATH /  'meeting_ended_by_host_2.png'), confidence=0.9) is not None):
+                IMG_PATH /  'meeting_ended_by_host_2.png', confidence=0.9) is not None):
                 ONGOING_MEETING = False
                 logging.info("Meeting ended by host..")
             time.sleep(self.interval)
@@ -196,12 +196,11 @@ class HideViewOptionsThread:
                 if not VIDEO_PANEL_HIDDEN:
                     logging.info("Screensharing active..")
                     try:
-                        x, y = pyautogui.locateCenterOnScreen(os.path.join(
-                            IMG_PATH, 'view_options.png'), confidence=0.9)
+                        x, y = pyautogui.locateCenterOnScreen(IMG_PATH / 'view_options.png', confidence=0.9)
                         pyautogui.click(x, y)
                         time.sleep(1)
                         # Hide video panel
-                        if pyautogui.locateOnScreen(os.path.join(IMG_PATH, 'show_video_panel.png'),
+                        if pyautogui.locateOnScreen(IMG_PATH /  'show_video_panel.png'),
                                                     confidence=0.9) is not None:
                             # Leave 'Show video panel' and move mouse from screen
                             pyautogui.moveTo(0, 100)
@@ -310,15 +309,9 @@ def join_meeting_id(meet_id):
     pyautogui.write(DISPLAY_NAME, interval=0.1)
 
     # Configure
-    pyautogui.press('tab')
-    pyautogui.press('space')
-    pyautogui.press('tab')
-    pyautogui.press('tab')
-    pyautogui.press('space')
-    pyautogui.press('tab')
-    pyautogui.press('tab')
-    pyautogui.press('space')
-
+    press_sequence(
+        ['tab',  'space',  'tab',  'tab',  'space',  'tab',  'tab',  'space']
+        )
     time.sleep(2)
 
     return check_error()
@@ -349,8 +342,7 @@ def check_error():
         logging.error("Maybe a invalid meeting id was inserted..")
         left = False
         try:
-            x, y = pyautogui.locateCenterOnScreen(
-                os.path.join(IMG_PATH, 'leave.png'), confidence=0.9)
+            x, y = pyautogui.locateCenterOnScreen(IMG_PATH /  'leave.png', confidence=0.9)
             pyautogui.click(x, y)
             left = True
         except TypeError:
@@ -358,8 +350,7 @@ def check_error():
             # Valid id
 
         if left:
-            if pyautogui.locateCenterOnScreen(os.path.join(
-                    IMG_PATH, 'join_meeting.png'), confidence=0.9) is not None:
+            if pyautogui.locateCenterOnScreen(IMG_PATH / 'join_meeting.png', confidence=0.9) is not None:
                 logging.error("Invalid meeting id!")
                 return False
         else:
@@ -411,8 +402,7 @@ def join_audio(description):
     if not audio_joined:
         try:
             show_toolbars()
-            x, y = pyautogui.locateCenterOnScreen(os.path.join(
-                IMG_PATH, 'join_audio.png'), confidence=0.9)
+            x, y = pyautogui.locateCenterOnScreen(IMG_PATH / 'join_audio.png', confidence=0.9)
             pyautogui.click(x, y)
             join_audio(description)
         except TypeError:
@@ -565,8 +555,7 @@ def join(meet_id, meet_pw, duration, description):
                 atexit.unregister(os.killpg)
             return
 
-        if pyautogui.locateCenterOnScreen(os.path.join(
-                IMG_PATH, 'wait_for_host.png'), confidence=0.9) is None:
+        if pyautogui.locateCenterOnScreen(IMG_PATH / 'wait_for_host.png', confidence=0.9) is None:
             logging.info("Maybe meeting was started now.")
             check_periods += 1
             if check_periods >= 2:
@@ -743,8 +732,7 @@ def join(meet_id, meet_pw, duration, description):
     if screensharing_active:
         # hide video panel
         try:
-            x, y = pyautogui.locateCenterOnScreen(os.path.join(
-                IMG_PATH, 'hide_video_panel.png'), confidence=0.9)
+            x, y = pyautogui.locateCenterOnScreen(IMG_PATH / 'hide_video_panel.png', confidence=0.9)
             pyautogui.click(x, y)
             VIDEO_PANEL_HIDDEN = True
         except TypeError:
@@ -759,7 +747,7 @@ def join(meet_id, meet_pw, duration, description):
         logging.info("Switch view..")
         try:
             x, y = pyautogui.locateCenterOnScreen(
-                os.path.join(IMG_PATH, 'view.png'), confidence=0.9)
+                IMG_PATH /  'view.png', confidence=0.9)
             pyautogui.click(x, y)
         except TypeError:
             logging.error("Could not find view!")
@@ -771,8 +759,7 @@ def join(meet_id, meet_pw, duration, description):
 
         try:
             # speaker view
-            x, y = pyautogui.locateCenterOnScreen(os.path.join(
-                IMG_PATH, 'speaker_view.png'), confidence=0.9)
+            x, y = pyautogui.locateCenterOnScreen(IMG_PATH / 'speaker_view.png', confidence=0.9)
             pyautogui.click(x, y)
         except TypeError:
             logging.error("Could not switch speaker view!")
@@ -782,7 +769,7 @@ def join(meet_id, meet_pw, duration, description):
 
         try:
             # minimize panel
-            x, y = pyautogui.locateCenterOnScreen(IMG_PATH / 'minimize.png'), confidence=0.9)
+            x, y = pyautogui.locateCenterOnScreen(IMG_PATH / 'minimize.png', confidence=0.9)
             pyautogui.click(x, y)
         except TypeError:
             logging.error("Could not minimize panel!")
@@ -921,13 +908,13 @@ def join_ongoing_meeting():
                 if start_time < end_time:
                     if start_time <= curr_time <= end_time and str(row["record"]) == 'true':
                             logging.info(
-                                "Join meeting that is currently running..")
+                                "Joining meeting that is currently running..")
                             join(meet_id=row["id"], meet_pw=row["password"],
                                  duration=recent_duration, description=row["description"])
                 else:  # crosses midnight
                     if curr_time >= start_time or curr_time <= end_time and str(row["record"]) == 'true':
                             logging.info(
-                                "Join meeting that is currently running..")
+                                "Joining meeting that is currently running..")
                             join(meet_id=row["id"], meet_pw=row["password"],
                                  duration=recent_duration, description=row["description"])
 
