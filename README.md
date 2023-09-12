@@ -1,3 +1,9 @@
+> [!NOTE]
+> This is a fork of [kastldratza/zoomrec](https://github.com/kastldratza/zoomrec) with some changes to make it work (better) for me.
+> Changes include:
+> - Code structure (pathlib, helper functions, typos in variable names, etc.)
+> - The Python script's output goes to the regular output instad of a terminal in the container
+
 There's a list of many repos with similar goals at https://github.com/rootCircle/Zoom-AutoRecorder
 
 ---

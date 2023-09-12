@@ -170,7 +170,7 @@ class HideViewOptionsThread:
         logging.debug("Check continuously if screensharing is active..")
         while ONGOING_MEETING:
             # Check if host is sharing poll results
-            if (pyautogui.locateCenterOnScreen(IMG_PATH /  'host_is_sharing_poll_results.png'),
+            if (pyautogui.locateCenterOnScreen(IMG_PATH /  'host_is_sharing_poll_results.png',
                                                confidence=0.9,
                                                minSearchTime=2) is not None):
                 logging.info("Host is sharing poll results..")
@@ -185,12 +185,12 @@ class HideViewOptionsThread:
                         logging.error("Could not exit poll results window!")
                         if DEBUG:
                             pyautogui.screenshot(os.path.join(DEBUG_PATH, time.strftime(
-                                TIME_FORMAT) + "-" + description) + "_close_poll_results_error.png")
+                                TIME_FORMAT) + "_close_poll_results_error.png"))
                 except TypeError:
                     logging.error("Could not find poll results window anymore!")
                     if DEBUG:
                         pyautogui.screenshot(os.path.join(DEBUG_PATH, time.strftime(
-                            TIME_FORMAT) + "-" + description) + "_find_poll_results_error.png")
+                            TIME_FORMAT) + "_find_poll_results_error.png"))
 
             # Check if view options available
             if pyautogui.locateOnScreen(IMG_PATH /  'view_options.png', confidence=0.9) is not None:
@@ -285,8 +285,7 @@ def join_meeting_id(meet_id):
     logging.info("Join a meeting by ID..")
     found_join_meeting = False
     try:
-        x, y = pyautogui.locateCenterOnScreen(os.path.join(
-            IMG_PATH, 'join_meeting.png'), minSearchTime=2, confidence=0.9)
+        x, y = pyautogui.locateCenterOnScreen(IMG_PATH / 'join_meeting.png', minSearchTime=2, confidence=0.9)
         pyautogui.click(x, y)
         found_join_meeting = True
     except TypeError:
@@ -488,7 +487,7 @@ def join(meet_id, meet_pw, duration, description):
         time.sleep(1)
 
     # Wait until zoom is started
-    while pyautogui.locateCenterOnScreen(IMG_PATH /  img_name), confidence=0.9) is None:
+    while pyautogui.locateCenterOnScreen(IMG_PATH /  img_name, confidence=0.9) is None:
         logging.info("Zoom not ready yet!")
         time.sleep(1)
 
@@ -616,16 +615,14 @@ def join(meet_id, meet_pw, duration, description):
             logging.error("Could not accept recording!")
 
     # Check if host is sharing poll results at the beginning
-    if (pyautogui.locateCenterOnScreen(os.path.join(IMG_PATH, 'host_is_sharing_poll_results.png'), confidence=0.9,
+    if (pyautogui.locateCenterOnScreen(IMG_PATH / 'host_is_sharing_poll_results.png', confidence=0.9,
                                        minSearchTime=2) is not None):
         logging.info("Host is sharing poll results..")
         try:
-            x, y = pyautogui.locateCenterOnScreen(os.path.join(
-                IMG_PATH, 'host_is_sharing_poll_results.png'), confidence=0.9)
+            x, y = pyautogui.locateCenterOnScreen(IMG_PATH / 'host_is_sharing_poll_results.png', confidence=0.9)
             pyautogui.click(x, y)
             try:
-                x, y = pyautogui.locateCenterOnScreen(os.path.join(
-                    IMG_PATH, 'exit.png'), confidence=0.9)
+                x, y = pyautogui.locateCenterOnScreen(IMG_PATH / 'exit.png', confidence=0.9)
                 pyautogui.click(x, y)
                 logging.info("Closed poll results window..")
             except TypeError:
