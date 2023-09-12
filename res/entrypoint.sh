@@ -63,11 +63,15 @@ if [[ "$DEBUG" == "True" ]]; then
   echo "HOME: ${HOME}"
   stat /home/zoomrec
   stat /home/zoomrec/zoomrec.py
-  xfce4-terminal -H --geometry 85x7+0 --title=zoomrec --hide-toolbar --hide-menubar --hide-scrollbar --hide-borders --zoom=-3 -e "python3 -u ${HOME}/zoomrec.py"
+  # ⚠ This means that output from the script is not visible from here!
+  # xfce4-terminal -H --geometry 85x7+0 --title=zoomrec --hide-toolbar --hide-menubar --hide-scrollbar --hide-borders --zoom=-3 -e "python3 -u ${HOME}/zoomrec.py"
+  python3 -u /home/zoomrec/zoomrec.py
 else
   # Exit container if something failed
   echo "Starting Python script in normal mode (exits on error)"
-  xfce4-terminal --geometry 85x7+0 --title=zoomrec --hide-toolbar --hide-menubar --hide-scrollbar --hide-borders --zoom=-3 -e "python3 -u ${HOME}/zoomrec.py"
+  # ⚠ This means that output from the script is not visible from here!
+  # xfce4-terminal --geometry 85x7+0 --title=zoomrec --hide-toolbar --hide-menubar --hide-scrollbar --hide-borders --zoom=-3 -e "python3 -u ${HOME}/zoomrec.py"
+  python3 -u /home/zoomrec/zoomrec.py
 fi
 
 echo "Script exited"
