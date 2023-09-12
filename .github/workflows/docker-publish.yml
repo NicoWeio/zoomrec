@@ -3,16 +3,8 @@ name: Publish Docker image
 on:
   push:
     branches: [ master ]
-    paths-ignore:
-      - 'doc/**'
-      - 'README.md'
-      - 'example/**'
   pull_request:
     branches: [ master ]
-    paths-ignore:
-      - 'doc/**'
-      - 'README.md'
-      - 'example/**'
 
 jobs:
   push_to_ghcr:
