@@ -60,6 +60,9 @@ export SESSION_MANAGER=$(cat ~/.ICEauthority | perl -pe 's/.*(local.*?unix\/\d*)
 if [[ "$DEBUG" == "True" ]]; then
   # Wait if something failed
   echo "Starting Python script in debug mode (waits on error)"
+  echo "HOME: ${HOME}"
+  stat /home/zoomrec
+  stat /home/zoomrec/zoomrec.py
   xfce4-terminal -H --geometry 85x7+0 --title=zoomrec --hide-toolbar --hide-menubar --hide-scrollbar --hide-borders --zoom=-3 -e "python3 -u ${HOME}/zoomrec.py"
 else
   # Exit container if something failed
