@@ -12,6 +12,7 @@ import time
 import atexit
 import requests
 from datetime import datetime, timedelta
+from pathlib import Path
 
 global ONGOING_MEETING
 global VIDEO_PANEL_HIDDEN
@@ -32,12 +33,12 @@ DEBUG = True if os.getenv('DEBUG') == 'True' else False
 pyautogui.FAILSAFE = False
 
 # Get vars
-BASE_PATH = os.getenv('HOME')
-CSV_PATH = os.path.join(BASE_PATH, "meetings.csv")
-IMG_PATH = os.path.join(BASE_PATH, "img")
-REC_PATH = os.path.join(BASE_PATH, "recordings")
-AUDIO_PATH = os.path.join(BASE_PATH, "audio")
-DEBUG_PATH = os.path.join(REC_PATH, "screenshots")
+BASE_PATH = Path.home() # os.getenv('HOME')
+CSV_PATH = BASE_PATH / "meetings.csv"
+IMG_PATH = BASE_PATH / "img"
+REC_PATH = BASE_PATH / "recordings"
+AUDIO_PATH = BASE_PATH / "audio"
+DEBUG_PATH = REC_PATH / "screenshots"
 
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
 TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
@@ -145,9 +146,9 @@ class BackgroundThread:
                     logging.error("Could not accept recording!")
 
             # Check if ended
-            if (pyautogui.locateOnScreen(os.path.join(IMG_PATH, 'meeting_ended_by_host_1.png'),
+            if (pyautogui.locateOnScreen(IMG_PATH /  'meeting_ended_by_host_1.png'),
                                          confidence=0.9) is not None or pyautogui.locateOnScreen(
-                os.path.join(IMG_PATH, 'meeting_ended_by_host_2.png'), confidence=0.9) is not None):
+                IMG_PATH /  'meeting_ended_by_host_2.png'), confidence=0.9) is not None):
                 ONGOING_MEETING = False
                 logging.info("Meeting ended by host..")
             time.sleep(self.interval)
@@ -168,17 +169,15 @@ class HideViewOptionsThread:
         logging.debug("Check continuously if screensharing is active..")
         while ONGOING_MEETING:
             # Check if host is sharing poll results
-            if (pyautogui.locateCenterOnScreen(os.path.join(IMG_PATH, 'host_is_sharing_poll_results.png'),
+            if (pyautogui.locateCenterOnScreen(IMG_PATH /  'host_is_sharing_poll_results.png'),
                                                confidence=0.9,
                                                minSearchTime=2) is not None):
                 logging.info("Host is sharing poll results..")
                 try:
-                    x, y = pyautogui.locateCenterOnScreen(os.path.join(
-                        IMG_PATH, 'host_is_sharing_poll_results.png'), confidence=0.9)
+                    x, y = pyautogui.locateCenterOnScreen(IMG_PATH / 'host_is_sharing_poll_results.png', confidence=0.9)
                     pyautogui.click(x, y)
                     try:
-                        x, y = pyautogui.locateCenterOnScreen(os.path.join(
-                            IMG_PATH, 'exit.png'), confidence=0.9)
+                        x, y = pyautogui.locateCenterOnScreen(IMG_PATH / 'exit.png', confidence=0.9)
                         pyautogui.click(x, y)
                         logging.info("Closed poll results window..")
                     except TypeError:
@@ -193,7 +192,7 @@ class HideViewOptionsThread:
                             TIME_FORMAT) + "-" + description) + "_find_poll_results_error.png")
 
             # Check if view options available
-            if pyautogui.locateOnScreen(os.path.join(IMG_PATH, 'view_options.png'), confidence=0.9) is not None:
+            if pyautogui.locateOnScreen(IMG_PATH /  'view_options.png', confidence=0.9) is not None:
                 if not VIDEO_PANEL_HIDDEN:
                     logging.info("Screensharing active..")
                     try:
@@ -210,8 +209,7 @@ class HideViewOptionsThread:
                             VIDEO_PANEL_HIDDEN = True
                         else:
                             try:
-                                x, y = pyautogui.locateCenterOnScreen(os.path.join(
-                                    IMG_PATH, 'hide_video_panel.png'), confidence=0.9)
+                                x, y = pyautogui.locateCenterOnScreen(IMG_PATH / 'hide_video_panel.png', confidence=0.9)
                                 pyautogui.click(x, y)
                                 # Move mouse from screen
                                 pyautogui.moveTo(0, 100)
@@ -262,7 +260,7 @@ def wait_for_connecting(zoom_pid, start_date, duration):
     check_periods = 0
     connecting = False
     # Check if connecting
-    if pyautogui.locateCenterOnScreen(os.path.join(IMG_PATH, 'connecting.png'), confidence=0.9) is not None:
+    if pyautogui.locateCenterOnScreen(IMG_PATH /  'connecting.png', confidence=0.9) is not None:
         connecting = True
         logging.info("Connecting..")
 
@@ -275,7 +273,7 @@ def wait_for_connecting(zoom_pid, start_date, duration):
             os.killpg(os.getpgid(zoom_pid), signal.SIGQUIT)
             return
 
-        if pyautogui.locateCenterOnScreen(os.path.join(IMG_PATH, 'connecting.png'), confidence=0.9) is None:
+        if pyautogui.locateCenterOnScreen(IMG_PATH /  'connecting.png', confidence=0.9) is None:
             logging.info("Maybe not connecting anymore..")
             check_periods += 1
             if check_periods >= 2:
@@ -347,8 +345,7 @@ def check_error():
     """
     Sometimes invalid id error is displayed
     """
-    if pyautogui.locateCenterOnScreen(os.path.join(
-            IMG_PATH, 'invalid_meeting_id.png'), confidence=0.9) is not None:
+    if pyautogui.locateCenterOnScreen(IMG_PATH / 'invalid_meeting_id.png', confidence=0.9) is not None:
         logging.error("Maybe a invalid meeting id was inserted..")
         left = False
         try:
@@ -368,8 +365,7 @@ def check_error():
         else:
             return True
 
-    if pyautogui.locateCenterOnScreen(os.path.join(
-            IMG_PATH, 'authorized_attendees_only.png'), confidence=0.9) is not None:
+    if pyautogui.locateCenterOnScreen(IMG_PATH / 'authorized_attendees_only.png', confidence=0.9) is not None:
         logging.error("This meeting is for authorized attendees only!")
         return False
 
@@ -401,8 +397,7 @@ def show_toolbars():
 def join_audio(description):
     audio_joined = False
     try:
-        x, y = pyautogui.locateCenterOnScreen(os.path.join(
-            IMG_PATH, 'join_with_computer_audio.png'), confidence=0.9)
+        x, y = pyautogui.locateCenterOnScreen(IMG_PATH / 'join_with_computer_audio.png', confidence=0.9)
         logging.info("Join with computer audio..")
         pyautogui.click(x, y)
         audio_joined = True
@@ -432,8 +427,7 @@ def join_audio(description):
 def unmute(description):
     try:
         show_toolbars()
-        x, y = pyautogui.locateCenterOnScreen(os.path.join(
-            IMG_PATH, 'unmute.png'), confidence=0.9)
+        x, y = pyautogui.locateCenterOnScreen(IMG_PATH / 'unmute.png', confidence=0.9)
         pyautogui.click(x, y)
         return True
     except TypeError:
@@ -446,8 +440,7 @@ def unmute(description):
 def mute(description):
     try:
         show_toolbars()
-        x, y = pyautogui.locateCenterOnScreen(os.path.join(
-            IMG_PATH, 'mute.png'), confidence=0.9)
+        x, y = pyautogui.locateCenterOnScreen(IMG_PATH / 'mute.png', confidence=0.9)
         pyautogui.click(x, y)
         return True
     except TypeError:
@@ -506,7 +499,7 @@ def join(meet_id, meet_pw, duration, description):
         time.sleep(1)
 
     # Wait until zoom is started
-    while pyautogui.locateCenterOnScreen(os.path.join(IMG_PATH, img_name), confidence=0.9) is None:
+    while pyautogui.locateCenterOnScreen(IMG_PATH /  img_name), confidence=0.9) is None:
         logging.info("Zoom not ready yet!")
         time.sleep(1)
 
@@ -556,8 +549,7 @@ def join(meet_id, meet_pw, duration, description):
     time.sleep(2)
 
     # Check if waiting for host
-    if pyautogui.locateCenterOnScreen(os.path.join(
-            IMG_PATH, 'wait_for_host.png'), confidence=0.9, minSearchTime=3) is not None:
+    if pyautogui.locateCenterOnScreen(IMG_PATH / 'wait_for_host.png', confidence=0.9, minSearchTime=3) is not None:
         meeting_started = False
         logging.info("Please wait for the host to start this meeting.")
 
@@ -593,7 +585,7 @@ def join(meet_id, meet_pw, duration, description):
     time.sleep(2)
 
     # Check if joined into waiting room
-    if pyautogui.locateCenterOnScreen(os.path.join(IMG_PATH, 'waiting_room.png'), confidence=0.9,
+    if pyautogui.locateCenterOnScreen(IMG_PATH /  'waiting_room.png', confidence=0.9,
                                       minSearchTime=3) is not None:
         in_waitingroom = True
         logging.info("Please wait, the meeting host will let you in soon..")
@@ -610,8 +602,7 @@ def join(meet_id, meet_pw, duration, description):
                 atexit.unregister(os.killpg)
             return
 
-        if pyautogui.locateCenterOnScreen(os.path.join(
-                IMG_PATH, 'waiting_room.png'), confidence=0.9) is None:
+        if pyautogui.locateCenterOnScreen(IMG_PATH / 'waiting_room.png', confidence=0.9) is None:
             logging.info("Maybe no longer in the waiting room..")
             check_periods += 1
             if check_periods == 2:
@@ -626,12 +617,11 @@ def join(meet_id, meet_pw, duration, description):
     logging.info("Joined meeting..")
 
     # Check if recording warning is shown at the beginning
-    if (pyautogui.locateCenterOnScreen(os.path.join(IMG_PATH, 'meeting_is_being_recorded.png'), confidence=0.9,
+    if (pyautogui.locateCenterOnScreen(IMG_PATH /  'meeting_is_being_recorded.png', confidence=0.9,
                                        minSearchTime=2) is not None):
         logging.info("This meeting is being recorded..")
         try:
-            x, y = pyautogui.locateCenterOnScreen(os.path.join(
-                IMG_PATH, 'got_it.png'), confidence=0.9)
+            x, y = pyautogui.locateCenterOnScreen(IMG_PATH / 'got_it.png', confidence=0.9)
             pyautogui.click(x, y)
             logging.info("Accepted recording..")
         except TypeError:
@@ -684,7 +674,7 @@ def join(meet_id, meet_pw, duration, description):
     show_toolbars()
     try:
         x, y = pyautogui.locateCenterOnScreen(
-            os.path.join(IMG_PATH, 'view.png'), confidence=0.9)
+            IMG_PATH /  'view.png', confidence=0.9)
         pyautogui.click(x, y)
     except TypeError:
         logging.error("Could not find view!")
@@ -697,7 +687,7 @@ def join(meet_id, meet_pw, duration, description):
     fullscreen = False
     try:
         x, y = pyautogui.locateCenterOnScreen(
-            os.path.join(IMG_PATH, 'fullscreen.png'), confidence=0.9)
+            IMG_PATH /  'fullscreen.png', confidence=0.9)
         pyautogui.click(x, y)
         fullscreen = True
     except TypeError:
@@ -711,8 +701,7 @@ def join(meet_id, meet_pw, duration, description):
     # Screensharing already active
     if not fullscreen:
         try:
-            x, y = pyautogui.locateCenterOnScreen(os.path.join(
-                IMG_PATH, 'view_options.png'), confidence=0.9)
+            x, y = pyautogui.locateCenterOnScreen(IMG_PATH / 'view_options.png', confidence=0.9)
             pyautogui.click(x, y)
         except TypeError:
             logging.error("Could not find view options!")
@@ -726,8 +715,7 @@ def join(meet_id, meet_pw, duration, description):
 
         logging.info("Enter fullscreen..")
         try:
-            x, y = pyautogui.locateCenterOnScreen(os.path.join(
-                IMG_PATH, 'enter_fullscreen.png'), confidence=0.9)
+            x, y = pyautogui.locateCenterOnScreen(IMG_PATH / 'enter_fullscreen.png', confidence=0.9)
             pyautogui.click(x, y)
         except TypeError:
             logging.error("Could not enter fullscreen by image!")
@@ -741,8 +729,7 @@ def join(meet_id, meet_pw, duration, description):
     # Screensharing not active
     screensharing_active = False
     try:
-        x, y = pyautogui.locateCenterOnScreen(os.path.join(
-            IMG_PATH, 'view_options.png'), confidence=0.9)
+        x, y = pyautogui.locateCenterOnScreen(IMG_PATH / 'view_options.png', confidence=0.9)
         pyautogui.click(x, y)
         screensharing_active = True
     except TypeError:
@@ -795,8 +782,7 @@ def join(meet_id, meet_pw, duration, description):
 
         try:
             # minimize panel
-            x, y = pyautogui.locateCenterOnScreen(os.path.join(
-                IMG_PATH, 'minimize.png'), confidence=0.9)
+            x, y = pyautogui.locateCenterOnScreen(IMG_PATH / 'minimize.png'), confidence=0.9)
             pyautogui.click(x, y)
         except TypeError:
             logging.error("Could not minimize panel!")
@@ -864,8 +850,7 @@ def join(meet_id, meet_pw, duration, description):
     if not ONGOING_MEETING:
         try:
             # Press OK after meeting ended by host
-            x, y = pyautogui.locateCenterOnScreen(
-                os.path.join(IMG_PATH, 'ok.png'), confidence=0.9)
+            x, y = pyautogui.locateCenterOnScreen(IMG_PATH /  'ok.png', confidence=0.9)
             pyautogui.click(x, y)
         except TypeError:
             if DEBUG:
