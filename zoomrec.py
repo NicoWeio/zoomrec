@@ -476,13 +476,6 @@ def join(meet_id, meet_pw, duration, description):
         time.sleep(2)
         joined = join_meeting_url()
 
-    # Agree to the ToS and Privacy Policy
-    if pyautogui.locateCenterOnScreen(os.path.join(
-            IMG_PATH, 'i_agree.png'), confidence=0.9, minSearchTime=3) is not None:
-        logging.info("Accepting ToS / Privacy Policy..")
-        # pyautogui.press('tab')
-        pyautogui.press('space')
-
     if not joined:
         send_telegram_message("Failed to join meeting {}!".format(description))
         logging.error("Failed to join meeting!")
@@ -501,9 +494,23 @@ def join(meet_id, meet_pw, duration, description):
         pyautogui.press('tab')
         pyautogui.press('space')
 
-    # Joined meeting
     # Check if connecting
-    check_connecting(zoom.pid, start_date, duration)
+    wait_for_connecting(zoom.pid, start_date, duration)
+
+    # Agree to the ToS and Privacy Policy
+    while pyautogui.locateCenterOnScreen(os.path.join(
+            IMG_PATH, 'i_agree.png'), confidence=0.9, minSearchTime=3) is not None:
+        logging.info("Accepting ToS / Privacy Policy..")
+        pyautogui.press('space')
+        pyautogui.press('tab') # TODO: This is just to brute-force with less restarts
+        time.sleep(2)
+    else:
+        logging.info("Did not find ToS / Privacy Policy dialog.")
+
+    # Check if connecting
+    wait_for_connecting(zoom.pid, start_date, duration)
+
+    logging.info("Joined meeting! :)")
 
     # Check if meeting is started by host
     check_periods = 0
