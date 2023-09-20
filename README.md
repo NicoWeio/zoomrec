@@ -1,3 +1,10 @@
+> [!NOTE]
+> This is a fork of [kastldratza/zoomrec](https://github.com/kastldratza/zoomrec), which has not seen any activity for a while.
+> There are many [stale issues](https://github.com/kastldratza/zoomrec/issues?q=is%3Aissue+is%3Aclosed) with many good feature requests that have not been addressed.
+> Since at the moment I don't regularly use this tool myself, I'm not sure if this repository will be any better long-term,
+> but as of now, mine works and the original doesn't. :)
+
+
 <h1 align="center">
     zoomrec	
 </h1>
