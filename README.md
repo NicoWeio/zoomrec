@@ -50,16 +50,8 @@ Registry.
 
 ### Docker Registry
 
-Docker images are build and pushed automatically to [**Docker
-Hub**](https://hub.docker.com/repository/docker/kastldratza/zoomrec) and [**GitHub Container
-Registry**](https://github.com/kastldratza/zoomrec/pkgs/container/zoomrec).
-
-So you can choose and use one of them:
-
-- ```ghcr.io/kastldratza/zoomrec:master```
-- ```kastldratza/zoomrec:latest```
-
-*For my examples in this README I used* ```kastldratza/zoomrec:latest```
+Docker images are build and pushed automatically to [**GitHub Container
+Registry**](https://github.com/NicoWeio/zoomrec/pkgs/container/zoomrec).
 
 ---
 
